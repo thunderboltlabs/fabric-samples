@@ -60,42 +60,52 @@ var Chaincode = class {
   }
 
   async invoke(stub, args) {
-    if (args.length != 3) {
-      throw new Error('Incorrect number of arguments. Expecting 3');
+    console.log("test ************************************************");
+    if (args.length != 4 ) {
+      throw new Error('Incorrect number of arguments. Expecting 5');
     }
 
-    let A = args[0];
-    let B = args[1];
-    if (!A || !B) {
+    let fromAccount = args[0];
+    let toAccount = args[2];
+    if (!fromAccount || !toAccount) {
       throw new Error('asset holding must not be empty');
     }
 
+    let fromAmount = parseInt(args[1]);
+    let toAmount = parseInt(args[3]);
+
+    console.log (`Debiting ${fromAmount} from ${fromAccount} and crediting ${toAmount} to ${toAccount}`);
+    if (!fromAmount || !toAmount) {
+      throw new Error('Transfer values must not be empty')
+    }
+
     // Get the state from the ledger
-    let Avalbytes = await stub.getState(A);
-    if (!Avalbytes) {
-      throw new Error('Failed to get state of asset holder A');
+    let fromValBytes = await stub.getState(fromAccount);
+    if (!fromValBytes) {
+      throw new Error(`Failed to get state of asset holder ${fromAccount}`);
     }
-    let Aval = parseInt(Avalbytes.toString());
+    let val = parseInt(fromValBytes.toString());
 
-    let Bvalbytes = await stub.getState(B);
-    if (!Bvalbytes) {
-      throw new Error('Failed to get state of asset holder B');
+    let toValBytes = await stub.getState(toAccount);
+    if (!toValBytes) {
+      throw new Error(`Failed to get state of asset holder ${toAccount}`);
     }
 
-    let Bval = parseInt(Bvalbytes.toString());
+    let toVal = parseInt(toValBytes.toString());
+    let fromVal = parseInt(fromValBytes.toString());
     // Perform the execution
-    let amount = parseInt(args[2]);
-    if (typeof amount !== 'number') {
-      throw new Error('Expecting integer value for amount to be transaferred');
+    console.log (`Pre-execution fromAmount is ${fromAmount} and toAmount is ${toAmount}`);
+    if (typeof fromAmount !== 'number' || typeof toAmount !== 'number') {
+      throw new Error('Expecting integer values for amounts to be transferred');
     }
 
-    Aval = Aval - amount;
-    Bval = Bval + amount;
-    console.info(util.format('Aval = %d, Bval = %d\n', Aval, Bval));
+    fromVal = fromVal - fromAmount;
+    toVal = toVal + toAmount;
+    console.info(util.format('fromVal = %d, toVal= %d\n', fromVal, toVal));
 
     // Write the states back to the ledger
-    await stub.putState(A, Buffer.from(Aval.toString()));
-    await stub.putState(B, Buffer.from(Bval.toString()));
+    await stub.putState(fromAccount, Buffer.from(fromVal.toString()));
+    await stub.putState(toAccount, Buffer.from(toVal.toString()));
 
   }
 
