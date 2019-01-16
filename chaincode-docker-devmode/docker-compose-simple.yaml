@@ -38,6 +38,7 @@ services:
     command: peer node start --peer-chaincodedev=true -o orderer:7050
     ports:
       - 7051:7051
+      - 7052:7052
       - 7053:7053
     depends_on:
       - orderer
