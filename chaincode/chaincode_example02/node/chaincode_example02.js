@@ -25,8 +25,8 @@ var Chaincode = class {
     let Aval = args[1];
     let Bval = args[3];
 
-    if (typeof parseInt(Aval) !== 'number' || typeof parseInt(Bval) !== 'number') {
-      return shim.error('Expecting integer value for asset holding');
+    if (typeof parseFloat(Aval) !== 'number' || typeof parseFloat(Bval) !== 'number') {
+      return shim.error('Expecting number value for asset holding');
     }
 
     try {
@@ -60,7 +60,6 @@ var Chaincode = class {
   }
 
   async invoke(stub, args) {
-    console.log("test ************************************************");
     if (args.length != 4 ) {
       throw new Error('Incorrect number of arguments. Expecting 5');
     }
@@ -71,8 +70,8 @@ var Chaincode = class {
       throw new Error('asset holding must not be empty');
     }
 
-    let fromAmount = parseInt(args[1]);
-    let toAmount = parseInt(args[3]);
+    let fromAmount = parseFloat(args[1]);
+    let toAmount = parseFloat(args[3]);
 
     console.log (`Debiting ${fromAmount} from ${fromAccount} and crediting ${toAmount} to ${toAccount}`);
     if (!fromAmount || !toAmount) {
@@ -96,7 +95,7 @@ var Chaincode = class {
     // Perform the execution
     console.log (`Pre-execution fromAmount is ${fromAmount} and toAmount is ${toAmount}`);
     if (typeof fromAmount !== 'number' || typeof toAmount !== 'number') {
-      throw new Error('Expecting integer values for amounts to be transferred');
+      throw new Error('Expecting number values for amounts to be transferred');
     }
 
     fromVal = fromVal - fromAmount;
